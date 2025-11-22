@@ -10,7 +10,8 @@ function RecommendationList({ recommendations }) {
       <ul>
         {recommendations.map((recommendation, index) => (
           <li key={index} className="mb-2">
-            {recommendation.name}
+            {recommendation.name} (Score:{' '}
+            {recommendation.score.toFixed(2) * 100}%)
           </li>
         ))}
       </ul>
