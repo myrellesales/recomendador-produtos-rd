@@ -5,9 +5,9 @@ import { Preferences, Features, RecommendationType } from './Fields';
 import { SubmitButton } from './SubmitButton';
 import useProducts from '../../hooks/useProducts';
 import useForm from '../../hooks/useForm';
-import useRecommendations from '../../hooks/useRecommendations';
+import recommendationService from '../../services/recommendation.service';
 
-function Form() {
+function Form({ setRecommendations }) {
   const { preferences, features, products } = useProducts();
   const { formData, handleChange } = useForm({
     selectedPreferences: [],
@@ -15,21 +15,23 @@ function Form() {
     selectedRecommendationType: '',
   });
 
-  const { getRecommendations, recommendations } = useRecommendations(products);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const dataRecommendations = getRecommendations(formData);
-
-    /**
-     * Defina aqui a lógica para atualizar as recomendações e passar para a lista de recomendações
-     */
-  };
+  useEffect(() => {
+    if (!formData.selectedRecommendationType) return;
+    const dataRecommendations = recommendationService.getRecommendations(
+      formData,
+      products
+    );
+    if (formData.selectedRecommendationType === 'SingleProduct') {
+      setRecommendations([dataRecommendations[0]]);
+    } else {
+      setRecommendations(dataRecommendations);
+    }
+  }, [formData, products, setRecommendations]);
 
   return (
     <form
       className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-md"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => e.preventDefault()}
     >
       <Preferences
         preferences={preferences}
