@@ -54,6 +54,20 @@ Para completar este teste, você deve concentrar-se principalmente em três arqu
 
 3. `recommendation.service.js`: Neste arquivo de serviço, você verá o comentário "Crie aqui a lógica para retornar os produtos recomendados." Implemente a lógica de negócios para determinar quais produtos devem ser recomendados com base nos critérios fornecidos.
 
+## Implementações Realizadas
+
+- Implementação completa da lógica de recomendação de produtos no serviço `recommendation.service.js`, seguindo os critérios definidos no desafio.
+- Integração da lógica de recomendação com a interface existente, conectando formulário e lista de recomendações.
+- Controle explícito do fluxo de recomendação via envio do formulário, evitando atualizações automáticas durante a seleção.
+- Tratamento dos tipos de recomendação `SingleProduct` e `MultipleProducts`, incluindo regra de desempate conforme especificado.
+- Implementação de testes unitários para validar os cenários principais da lógica de recomendação.
+- Pequenos ajustes de experiência do usuário foram realizados para melhorar a visualização das recomendações, sem alterar a estrutura base do layout fornecido.
+
+## Decisões Técnicas
+
+A lógica de recomendação foi centralizada em um serviço dedicado para manter o código modular, testável e extensível, permitindo futuras evoluções sem acoplamento direto à interface.
+
+
 ## Observações Adicionais
 
 - Sinta-se à vontade para implementar melhorias na cobertura de testes e no layout da aplicação, caso tenha tempo adicional.
@@ -80,6 +94,23 @@ Para completar este teste, você deve concentrar-se principalmente em três arqu
 - `start:frontend`: Inicia apenas a parte frontend da aplicação em modo de desenvolvimento.
 - `start:backend`: Inicia apenas a parte backend da aplicação em modo de desenvolvimento.
 - `dev`: Inicia simultaneamente a parte frontend e backend da aplicação em modo de desenvolvimento.
+
+#### Observações sobre execução do projeto
+
+Durante a execução do projeto, pode ser necessário instalar a dependência concurrently, utilizada para rodar o frontend e o backend simultaneamente.
+
+Caso o comando `npm run dev` ou `yarn dev` falhe por falta do pacote, instale-o como dependência de desenvolvimento:
+
+```bash
+npm install --save-dev concurrently
+ou
+yarn add --dev concurrently
+````
+Como alternativa, é possível iniciar o frontend e o backend sem instalar o concurrently, utilizando o comando:
+
+```bash
+npx concurrently "npm run start:frontend" "npm run start:backend"
+```
 
 ## Critérios de Aceite
 

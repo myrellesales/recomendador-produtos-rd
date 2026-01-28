@@ -8,50 +8,62 @@ const getRecommendations = (
    * lógica para retornar os produtos recomendados.
    */
 
-  let productResults = {};
-  let total = 0;
-  ['selectedPreferences', 'selectedFeatures'].forEach((_attr) => {
-    let productAttr = _attr.replace('selected', '').toLowerCase();
-    (Array.isArray(formData[_attr]) ? formData[_attr] : []).forEach((c) => {
-      for (let i = 0; i < products.length; i++) {
-        if (products[i][productAttr].indexOf(c) !== -1) {
-          let _id = products[i]['id'];
+  let matchesByProduct = {};
+  let totalMatches = 0;
 
-          if (!productResults[String(_id)]) {
-            productResults[String(_id)] = { name: products[i]['name'], qtd: 0 };
+  ['selectedPreferences', 'selectedFeatures'].forEach((formField) => {
+    const productField = formField.replace('selected', '').toLowerCase();
+
+    (Array.isArray(formData[formField]) ? formData[formField] : []).forEach(
+      (criterion) => {
+        for (let i = 0; i < products.length; i++) {
+          if (products[i][productField].indexOf(criterion) !== -1) {
+            const productId = products[i].id;
+
+            if (!matchesByProduct[String(productId)]) {
+              matchesByProduct[String(productId)] = {
+                name: products[i].name,
+                matches: 0,
+              };
+            }
+
+            matchesByProduct[String(productId)].matches += 1;
+            totalMatches += 1;
+
+            break;
           }
-          productResults[String(_id)]['qtd'] += 1;
-          total += 1;
-
-          break;
         }
       }
-    });
+    );
   });
 
-  let productResultScore = [];
-  Object.keys(productResults).forEach((product_id) => {
-    let qtd = productResults[product_id]['qtd'];
-    let name = productResults[product_id]['name'];
-    let score = parseFloat(qtd / total);
-    productResultScore.push({ id: product_id, score: score, name: name });
+  let scoredProducts = [];
+
+  Object.keys(matchesByProduct).forEach((productId) => {
+    const matches = matchesByProduct[productId].matches;
+    const name = matchesByProduct[productId].name;
+    const score = parseFloat(matches / totalMatches);
+
+    scoredProducts.push({ id: productId, score, name });
   });
 
-  let productResultScoreOrdered = productResultScore.sort(
+  const orderedProductsByScore = scoredProducts.sort(
     (a, b) => b.score - a.score
   );
 
   if (formData.selectedRecommendationType === 'SingleProduct') {
-    if (productResultScoreOrdered.length === 0) return [];
+    if (orderedProductsByScore.length === 0) return [];
+
     // se tiver empate, retorna o último do empate
-    const maxScore = productResultScoreOrdered[0].score;
-    const maxScoreProducts = productResultScoreOrdered.filter(
-      (p) => p.score === maxScore
+    const highestScore = orderedProductsByScore[0].score;
+    const highestScoreProducts = orderedProductsByScore.filter(
+      (product) => product.score === highestScore
     );
-    return [maxScoreProducts[maxScoreProducts.length - 1]];
+
+    return [highestScoreProducts[highestScoreProducts.length - 1]];
   }
 
-  return productResultScoreOrdered;
+  return orderedProductsByScore;
 };
 
 export default { getRecommendations };
