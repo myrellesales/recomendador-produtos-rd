@@ -1,6 +1,5 @@
 // Form.js
 
-import React, { useEffect } from 'react';
 import { Preferences, Features, RecommendationType } from './Fields';
 import { SubmitButton } from './SubmitButton';
 import useProducts from '../../hooks/useProducts';
@@ -15,23 +14,27 @@ function Form({ setRecommendations }) {
     selectedRecommendationType: '',
   });
 
-  useEffect(() => {
+    const handleSubmit = (e) => {
+    e.preventDefault();
+
     if (!formData.selectedRecommendationType) return;
+
     const dataRecommendations = recommendationService.getRecommendations(
       formData,
       products
     );
+
     if (formData.selectedRecommendationType === 'SingleProduct') {
-      setRecommendations([dataRecommendations[0]]);
+      setRecommendations(dataRecommendations.slice(0, 1));
     } else {
       setRecommendations(dataRecommendations);
     }
-  }, [formData, products, setRecommendations]);
+  };
 
   return (
     <form
-      className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-md"
-      onSubmit={(e) => e.preventDefault()}
+      className="w-full max-w-xl space-y-6"
+       onSubmit={handleSubmit}
     >
       <Preferences
         preferences={preferences}

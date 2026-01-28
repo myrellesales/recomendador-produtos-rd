@@ -2,24 +2,24 @@ import recommendationService from './recommendation.service';
 import mockProducts from '../mocks/mockProducts';
 
 describe('recommendationService', () => {
-  test('Retorna recomendação correta para SingleProduct com base nas preferências selecionadas', () => {
-    const formData = {
+  test('SingleProduct: retorna um único produto baseado nas preferências selecionadas', () => {
+    const userPreferences = {
       selectedPreferences: ['Integração com chatbots'],
       selectedFeatures: ['Chat ao vivo e mensagens automatizadas'],
       selectedRecommendationType: 'SingleProduct',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    expect(recommendations).toHaveLength(1);
-    expect(recommendations[0].name).toBe('RD Conversas');
+    expect(recommendedProducts).toHaveLength(1);
+    expect(recommendedProducts[0].name).toBe('RD Conversas');
   });
 
-  test('Retorna recomendações corretas para MultipleProducts com base nas preferências selecionadas', () => {
-    const formData = {
+  test('MultipleProducts: retorna lista de produtos baseada nas preferências selecionadas', () => {
+    const userPreferences = {
       selectedPreferences: [
         'Integração fácil com ferramentas de e-mail',
         'Personalização de funis de vendas',
@@ -32,20 +32,20 @@ describe('recommendationService', () => {
       selectedRecommendationType: 'MultipleProducts',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    expect(recommendations).toHaveLength(2);
-    expect(recommendations.map((product) => product.name)).toEqual([
+    expect(recommendedProducts).toHaveLength(2);
+    expect(recommendedProducts.map((product) => product.name)).toEqual([
       'RD Station CRM',
       'RD Station Marketing',
     ]);
   });
 
-  test('Retorna apenas um produto para SingleProduct com mais de um produto de match', () => {
-    const formData = {
+  test('SingleProduct: quando há mais de um produto com match, retorna apenas um', () => {
+    const userPreferences = {
       selectedPreferences: [
         'Integração fácil com ferramentas de e-mail',
         'Automação de marketing',
@@ -57,17 +57,17 @@ describe('recommendationService', () => {
       selectedRecommendationType: 'SingleProduct',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    expect(recommendations).toHaveLength(1);
-    expect(recommendations[0].name).toBe('RD Station Marketing');
+    expect(recommendedProducts).toHaveLength(1);
+    expect(recommendedProducts[0].name).toBe('RD Station Marketing');
   });
 
-  test('Retorna o último match em caso de empate para SingleProduct', () => {
-    const formData = {
+  test('SingleProduct: em caso de empate, retorna o último produto válido', () => {
+    const userPreferences = {
       selectedPreferences: [
         'Automação de marketing',
         'Integração com chatbots',
@@ -76,17 +76,17 @@ describe('recommendationService', () => {
       selectedRecommendationType: 'SingleProduct',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    expect(recommendations).toHaveLength(1);
-    expect(recommendations[0].name).toBe('RD Conversas');
+    expect(recommendedProducts).toHaveLength(1);
+    expect(recommendedProducts[0].name).toBe('RD Conversas');
   });
 
-  test('Retorna produtos ordenados por score decrescente', () => {
-    const formData = {
+  test('MultipleProducts: retorna produtos ordenados por score decrescente', () => {
+    const userPreferences = {
       selectedPreferences: [
         'Integração fácil com ferramentas de e-mail',
         'Automação de marketing',
@@ -98,32 +98,31 @@ describe('recommendationService', () => {
       selectedRecommendationType: 'MultipleProducts',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    // Verifica se está ordenado do maior para o menor score
-    for (let i = 0; i < recommendations.length - 1; i++) {
-      expect(recommendations[i].score).toBeGreaterThanOrEqual(
-        recommendations[i + 1].score
+    for (let i = 0; i < recommendedProducts.length - 1; i++) {
+      expect(recommendedProducts[i].score).toBeGreaterThanOrEqual(
+        recommendedProducts[i + 1].score
       );
     }
   });
 
-  test('Cada produto retornado possui id, name e score', () => {
-    const formData = {
+  test('Cada produto recomendado possui id, name e score numérico', () => {
+    const userPreferences = {
       selectedPreferences: ['Automação de marketing'],
       selectedFeatures: [],
       selectedRecommendationType: 'MultipleProducts',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    recommendations.forEach((product) => {
+    recommendedProducts.forEach((product) => {
       expect(product).toHaveProperty('id');
       expect(product).toHaveProperty('name');
       expect(product).toHaveProperty('score');
@@ -131,18 +130,18 @@ describe('recommendationService', () => {
     });
   });
 
-  test('Retorna array vazio quando não há matches', () => {
-    const formData = {
+  test('Retorna array vazio quando nenhuma preferência gera match', () => {
+    const userPreferences = {
       selectedPreferences: ['Preferência inexistente'],
       selectedFeatures: ['Feature inexistente'],
       selectedRecommendationType: 'MultipleProducts',
     };
 
-    const recommendations = recommendationService.getRecommendations(
-      formData,
+    const recommendedProducts = recommendationService.getRecommendations(
+      userPreferences,
       mockProducts
     );
 
-    expect(recommendations).toHaveLength(0);
+    expect(recommendedProducts).toHaveLength(0);
   });
 });
